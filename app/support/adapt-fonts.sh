@@ -34,9 +34,9 @@ function make_hex {
 	echo $HEX_OUT
 }
 
-
-DOCUMENT_FONT_NAME=`gconftool-2 --get /desktop/gnome/interface/font_name | sed "s/ [^ ]*$//"`
-DOCUMENT_FONT_SIZE=`gconftool-2 --get /desktop/gnome/interface/font_name | sed "s/^.*[^ ] //"`
+DOCUMENT_FONT=`gsettings get org.gnome.desktop.interface font-name | sed 's/^.\(.*\).$/\1/'`
+DOCUMENT_FONT_NAME=`echo $DOCUMENT_FONT | sed "s/ [^ ]*$//"`
+DOCUMENT_FONT_SIZE=`echo $DOCUMENT_FONT | sed "s/^.*[^ ] //"`
 
 OUTPUT="[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]\n"
 OUTPUT=$OUTPUT""\"MenuFont\""=hex:"`make_hex "$DOCUMENT_FONT_NAME" $DOCUMENT_FONT_SIZE 92`"\n"

@@ -39,8 +39,8 @@ fi
 
 if test ! -d "users" ; then
 	mkdir "users"
-	mkdir "user"
-	mkdir "user/Recent"
+	mkdir "users/user"
+	mkdir "users/user/Recent"
 fi
 
 cd "users"
@@ -54,6 +54,7 @@ find -maxdepth 1 ! -iregex '.*\(public\)' ! -iregex '.*\(user\)' ! -regex '.' -e
 
 # Link current profile to "user"
 ln -s "user" "$USER"
+ln -s "user" `id -u`
 
 # Configure local XDG directories
 if [ "$XDG_DESKTOP_DIR" = "" ] ; then XDG_DESKTOP_DIR="~/Desktop" ; fi
@@ -122,7 +123,7 @@ if [ $WINE_ASPECT ]; then
 		fi
 	fi
 
-	HEXDPI=$(( $HEXDPI + 32 ))
+	HEXDPI=$(( $HEXDPI ))
 	HEXDPI="`echo "$HEXDPI 16 o p" | dc`"
 
 	echo "" >>support/temp.reg

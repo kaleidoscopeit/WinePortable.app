@@ -1,0 +1,6 @@
+
+[HKEY_USERS\S-1-5-4\Software\Wine\DllOverrides]
+"winemenubuilder.exe"="native,builtin"
+
+[HKEY_USERS\S-1-5-21-0-0-0-1000\Software\Wine\DllOverrides]
+"winemenubuilder.exe"="native,builtin"

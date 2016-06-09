@@ -1,0 +1,36 @@
+#!/bin/bash
+
+cd "$PW/prefix/drive_c/users"
+if [ $? != '0' ] ; then
+	zenity --error --text="Si è verifcato un errore. La posizione '$PW/prefix/drive_c/users' non esiste!"
+	exit
+fi
+
+# Remove old profiles links
+find -maxdepth 1 ! -iregex '.*\(public\)' ! -iregex '.*\(user\)' ! -regex '.' -exec rm -r {} \;
+
+# Remove old links
+rm "user/Desktop"
+rm "user/Home"
+rm "user/My Pictures"
+rm "user/My Music"
+rm "user/My Videos"
+rm "user/Templates"
+rm -r "user/Temp/*" 
+rm -r "user/Recent/*" 
+
+cd "$PW"
+if [ $? != '0' ] ; then
+	zenity --error --text="Non è stato possibile tornare a '$PW'" --title="Wine Portable"
+	exit
+fi
+
+# TODO : Clean registry
+
+# Clean other links and directories
+rm prefix/dosdevices/*
+rm "prefix/drive_c/windows/temp"
+rm "prefix/drive_c/windows/Temp"
+rm -r "prefix/drive_c/windows/temp"
+rm -r "prefix/drive_c/windows/Temp"
+

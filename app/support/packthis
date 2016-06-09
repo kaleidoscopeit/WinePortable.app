@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd ..
+FILE=`pwd | rev | cut -d'/' -f1 | rev`
+
+cd ..
+tar -czf "$FILE.tar.gz" "$FILE" --verbose | zenity --progress --pulsate --text="Creazione dell'archivio in corso..." --title="Wine portable" --auto-close

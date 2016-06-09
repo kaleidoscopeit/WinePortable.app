@@ -1,0 +1,13 @@
+
+[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]
+"BorderWidth"="-15"
+"CaptionHeight"="-270"
+"CaptionWidth"="-270"
+"IconSpacing"="-1125"
+"IconTitleWrap"="1"
+"IconVerticalspacing"="-1125"
+"Shell Icon BPP"="16"
+"SmCaptionHeight"="-240"
+"SmCaptionWidth"="-240"
+"Shell Icon Size"="32"
+"MinAnimate"="1"

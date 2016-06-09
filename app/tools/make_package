@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PW=$(readlink -f "$0")
+PW=`dirname "$PW"`/..
+PW=`readlink -f "$PW"`
+
+cd "$PW"
+
+zenity --question --text="Verrà creato un archivio compresso di questa applicazione. Si vuole procedere?" --title="Wine Portable"
+if [ $? = "0" ]; then
+	source support/clean
+	source support/packthis
+fi

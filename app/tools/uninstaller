@@ -1,0 +1,14 @@
+#!/bin/sh
+PW=$(readlink -f "$0")
+PW=`dirname "$PW"`/..
+PW=`readlink -f "$PW"`
+
+PATH="$PW/wine/usr/bin/:$PATH"
+export WINEPREFIX="$PW/prefix/"
+export WINEDEBUG="-all"
+cd "$PW"
+
+# Uncomment this when the sandboxing job id done (See instructions)
+bash "support/integration" | zenity --progress --text="Applico l'integrazione con il desktop..." --title="`basename "$0"`" --auto-close
+
+wine uninstaller

@@ -1,0 +1,12 @@
+#!/bin/sh
+PW=$(readlink -f "$0")
+PW=`dirname "$PW"`/..
+PW=`readlink -f "$PW"`
+
+PATH="$PW/wine/usr/bin/:$PATH"
+export WINEPREFIX="$PW/prefix/"
+export WINEDEBUG="-all"
+cd "$PW"
+
+wineconsole cmd
+

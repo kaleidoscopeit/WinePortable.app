@@ -1,0 +1,30 @@
+#!/bin/bash
+PW=$(readlink -f "$0")
+PW=`dirname "$PW"`/app
+PW=`readlink -f "$PW"`
+PATH="$PW/wine/usr/bin/:$PATH"
+export WINEPREFIX="$PW/prefix/"
+cd "$PW"
+
+# Comment this to see debugging logs
+export WINEDEBUG="-all"
+
+# Uncomment this when the sandboxing job id done (See instructions)
+bash "support/integration" | zenity --progress --text="Applico l'integrazione con il desktop..." --title="`basename "$0"`" --auto-close
+
+# Your application directory (ie. "C:/Program files/Foo inc." )
+APPLICATION_PATH=""
+# The name of the executable (ie. foo.exe )
+EXECUTABLE=""
+# Buil the path of the called document
+FILE="`winepath -w "$@"`"
+# Change the directory path where is the executable (fix some issues)
+cd "`winepath -u "$APPLICATION_PATH"`"
+
+# Launch the application
+if [ "$FILE" = "" ]
+  then
+    wine "`winepath "$APPLICATION_PATH"/"$EXECUTABLE"`"
+  else
+    wine "`winepath "$APPLICATION_PATH"/"$EXECUTABLE"`" "$FILE"
+fi

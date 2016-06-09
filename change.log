@@ -1,0 +1,55 @@
+2012-04-04
+
+-	Updated "aspect.py" in order to force the menu height at 20px because a visual bug with the GTK3
+
+
+2011-09-27
+
+- Fixed menu height in case of the current DE is 'Unity'
+
+
+2011-03-16
+
+- Updated GTK-Colors and implemented the writing of the registry key "HKEY_USERS\S-1-5-21-0-0-0-1000\Control Panel" used by Wine starting from the release 1.3.15
+- Added a temporary fix to implements a rough mechanism which let to ban selected 'dpi' values because certain applications doesn't work well at some specific scales
+- Fixed 'integration' script when HEXDPI grows
+- Added the automatic copy of fake executable "winemenubuilder.exe"
+ 
+
+2010-11-25
+
+- Changed the Wine's 'dpi' scale in order to improve the readability of the dialogs
+- Added the fonts integration in the dialog windows in order to look like the one in the current desktop environment ( MS Shell Dlg )
+
+
+2010-10-20
+
+- The title of the dialog window 'desktop integration' now depends by the launched application name
+
+
+2010-07-20
+
+- Implemented the integration of the fonts in Wine applications with the system ones
+- Created README in italian
+
+
+2010-07-29
+
+- Introduced the configuration file which let to define the desired type of integration
+- Modified 'gtk-colors.py' in order to make only the regedit text and put it in the teporary regedit file
+- Created the script which integrates the desktop metrics
+- Modified the integration script in order to show the progress status
+
+
+2010-07-23
+
+- Fixed some bugs in the launcher script template
+- Updated gtk-colors.py
+- Updated Winetriks
+- Fixed the tool "cmd"
+- Inserted the pdf "Wine FAQ"
+- Created the instructions how to disable the automatic association of the Wine's extensions
+- Started the creation of the script to integrate the system fonts in Wine
+- Automatic adaptation of Wine with the system DPI
+- Registry file which sets the font of many dialog windows and menus to Bistream Vera Sans 10
+- Inserted the folter containing the font Bistream Vera 

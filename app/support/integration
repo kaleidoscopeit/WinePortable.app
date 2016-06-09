@@ -1,0 +1,170 @@
+#!/bin/bash
+
+PW=$(readlink -f "$0")
+PW=`dirname "$PW"`/..
+PW=`readlink -f "$PW"`
+
+USER=`whoami`
+PATH="$PW/wine/usr/bin/:$PATH"
+source ~/.config/user-dirs.dirs 
+export WINEPREFIX="$PW/prefix/"
+export WINEDEBUG="-all"
+cd "$PW"
+echo 10
+
+# Import the configuration file
+source app.config
+
+# Initiate the registry file
+echo "REGEDIT4" >support/temp.reg
+
+# Link some system dirs ( useful when this portable whas compressed whith this link removed )
+if [ ! -h "prefix/dosdevices/c:" ]; then ln -s "../drive_c" "prefix/dosdevices/c:";fi
+if [ ! -h "prefix/dosdevices/z:" ]; then ln -s "/" "prefix/dosdevices/z:";fi
+rm -r "prefix/drive_c/windows/temp"
+rm -r "prefix/drive_c/windows/Temp"
+ln -s "/tmp" "prefix/drive_c/windows/temp"
+
+# Try to inibith the modification of desktop file association
+mv "wine/usr/lib/wine/winemenubuilder.exe.so" "wine/usr/lib/wine/winemenubuilder.exe.so.bak"
+cp "support/winemenubuilder.exe" "prefix/drive_c/windows/system32/"
+cat support/winemenubuilder.reg >>support/temp.reg
+
+# Create the User directories if not exists
+cd "$PW/prefix/drive_c/"
+if [ $? != '0' ] ; then
+	zenity --error --text="Si è verifcato un errore. La posizione '$PW/prefix/drive_c/' non esiste!" --title="Wine Portable"
+	exit
+fi
+
+if test ! -d "users" ; then
+	mkdir "users"
+	mkdir "user"
+	mkdir "user/Recent"
+fi
+
+cd "users"
+if [ $? != '0' ] ; then
+	zenity --error --text="Si è verifcato un errore. La posizione '$PW/prefix/drive_c/users' non esiste!" --title="Wine Portable"
+	exit
+fi
+
+# Remove old profiles links
+find -maxdepth 1 ! -iregex '.*\(public\)' ! -iregex '.*\(user\)' ! -regex '.' -exec rm -r {} \;
+
+# Link current profile to "user"
+ln -s "user" "$USER"
+
+# Configure local XDG directories
+if [ "$XDG_DESKTOP_DIR" = "" ] ; then XDG_DESKTOP_DIR="~/Desktop" ; fi
+if [ "$XDG_DOCUMENTS_DIR" = "" ] ; then XDG_DOCUMENTS_DIR="~" ; fi
+if [ "$XDG_PICTURES_DIR" = "" ] ; then XDG_PICTURES_DIR="~/Pictures" ; fi
+if [ "$XDG_MUSIC_DIR" = "" ] ; then XDG_MUSIC_DIR="~/Music" ; fi
+if [ "$XDG_VIDEOS_DIR" = "" ] ; then XDG_VIDEOS_DIR="~/Video" ; fi
+if [ "$XDG_TEMPLATES_DIR" = "" ] ; then XDG_TEMPLATES_DIR="~/Templates" ; fi
+
+# Remove old links
+rm "user/Desktop"
+rm "user/Home"
+rm "user/My Pictures"
+rm "user/My Music"
+rm "user/My Videos"
+rm "user/Templates"
+
+# Relink home folders
+ln -s $XDG_DESKTOP_DIR "user/Desktop"
+ln -s ~ "user/Home"
+ln -s $XDG_PICTURES_DIR "user/My Pictures"
+ln -s $XDG_MUSIC_DIR "user/My Music"
+ln -s $XDG_VIDEOS_DIR "user/My Videos"
+ln -s $XDG_TEMPLATES_DIR "user/Templates"
+
+echo 20
+
+# Update the user shell folders links
+cd "$PW"
+perl -p -e 's/%USERNAME%/'`whoami`'/ ' support/shell_folders.reg >>./support/temp.reg
+
+# Fonts integration
+# -------------------------------
+# Copy the windws system font ( note, some fonts was hacked for best render )
+/bin/bash ./support/sys-fonts.sh
+
+echo 30
+
+# Adapt the windows fonts to the DE fonts
+if [ $WINE_FONTS ]; then
+	/bin/bash ./support/adapt-fonts.sh >>./support/temp.reg
+fi
+
+echo 40
+
+# Colors integration
+# -------------------------------
+# Attempt to clone the interface colors of the actual desktop environment
+# Make an else contition that will reset to default windows colors 
+if [ $WINE_COLORS ]; then
+	./support/gtk-colors.py >/dev/null
+fi
+
+echo 50
+# Adapt the metric
+# -------------------------------
+if [ $WINE_ASPECT ]; then
+	# DPI adaptation
+	HEXDPI="`gconftool-2 --get /desktop/gnome/font_rendering/dpi`"
+
+	# Temporary fix for buggy rendering of Pagemaker
+	# TODO need to be fully implemented
+	if [ $WINE_BANNED_DPI ]; then
+		if [ $HEXDPI = $WINE_BANNED_DPI ]; then
+			HEXDPI=$(( $HEXDPI - 10 ))
+		fi
+	fi
+
+	HEXDPI=$(( $HEXDPI + 32 ))
+	HEXDPI="`echo "$HEXDPI 16 o p" | dc`"
+
+	echo "" >>support/temp.reg
+	echo "[HKEY_LOCAL_MACHINE\System\CurrentControlSet\Hardware Profiles\Current\Software\Fonts]" >>support/temp.reg
+	echo '"LogPixels"=dword:000000'$HEXDPI >>support/temp.reg
+
+	# Controls adaptation
+	./support/aspect.py
+fi
+
+echo 60
+
+cat support/user_shell_folders.reg >>support/temp.reg
+
+echo 70
+
+cat support/profile_list.reg >>support/temp.reg
+
+echo 80
+cat support/forced_metrics.reg >>support/temp.reg
+
+echo 90
+
+regedit support/temp.reg
+rm support/temp.reg
+
+# Clean other links
+#rm prefix/dosdevices/c:
+#rm prefix/dosdevices/z:
+#rm wine/usr/lib/libwine.so
+#rm wine/usr/lib/libwine.so.1
+#rm wine/usr/bin/winecpp
+#rm wine/usr/bin/wineg++
+#rm wine/usr/share/man/man1/wineg++.1
+
+# Restore other links
+#ln -sf ../drive_c prefix/dosdevices/c:
+#ln -sf / prefix/dosdevices/z:
+#ln -sf wine/usr/lib/libwine.so.1.0 wine/usr/lib/libwine.so
+#ln -sf wine/usr/lib/libwine.so.1.0 wine/usr/lib/libwine.so.1
+#ln -sf winegcc wine/usr/bin/winecpp
+#ln -sf winegcc wine/usr/bin/wineg++
+#ln -sf ../../../bin/winegcc wine/usr/share/man/man1/wineg++.1
+
+echo 100
